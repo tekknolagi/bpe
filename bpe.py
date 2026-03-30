@@ -78,7 +78,7 @@ def colorize_tokens(tokens: list[str]) -> str:
 def encode(token_ids, steps, text):
     data = list(text)
     for step in steps:
-        data = merge_pair(data, step, step[0]+step[1])
+        data = merge_pair(data, tuple(step), step[0]+step[1])
     return [token_ids[t] for t in data]
 
 if __name__ == "__main__":
