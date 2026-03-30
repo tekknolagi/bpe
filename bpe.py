@@ -1,5 +1,3 @@
-TRAINING_DATA = open("advs.txt").read()
-
 import collections
 import string
 
