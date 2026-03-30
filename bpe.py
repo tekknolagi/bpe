@@ -39,18 +39,14 @@ def train(data, k=10):
         if c not in seen_tokens:
             tokens[len(tokens)] = c
             seen_tokens.add(c)
-    # Add the rest of the printable characters
-    for i in range(256):
-        c = chr(i)
-        if c not in seen_tokens:
-            tokens[len(tokens)] = c
-            seen_tokens.add(c)
     token_ids = {v: k for k, v in tokens.items()}
     steps = []
     next_token_id = max(tokens.keys()) + 1
     for i in range(k):
         data = train_one_round(tokens, token_ids, next_token_id, data, steps)
         next_token_id += 1
+    # TODO(max): Add the rest of the printable characters after training so the
+    # more common tokens get lower IDs
     return data, tokens, token_ids, steps
 
 def decode(tokens, data):
