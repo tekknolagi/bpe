@@ -32,7 +32,10 @@ def train_one_round(tokens, token_ids, next_token_id, data, steps):
     return merge_pair(data, pair, token)
 
 def train(data, k=10):
-    tokens = {x: chr(x) for x in range(256)}# if chr(x).isprintable()}
+    tokens = {}
+    for c in data:
+        if c not in tokens:
+            tokens[len(tokens)] = c
     token_ids = {v: k for k, v in tokens.items()}
     steps = []
     next_token_id = max(tokens.keys()) + 1
