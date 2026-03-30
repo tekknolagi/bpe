@@ -34,7 +34,14 @@ def train_one_round(tokens, token_ids, next_token_id, data, steps):
 def train(data, k=10):
     tokens = {}
     seen_tokens = set()
+    # Give the lowest token IDs to the chars in the corpus
     for c in data:
+        if c not in seen_tokens:
+            tokens[len(tokens)] = c
+            seen_tokens.add(c)
+    # Add the rest of the printable characters
+    for i in range(256):
+        c = chr(i)
         if c not in seen_tokens:
             tokens[len(tokens)] = c
             seen_tokens.add(c)
