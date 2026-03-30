@@ -31,17 +31,18 @@ def train_one_round(tokens, token_ids, next_token_id, data, steps):
     token_ids[token] = next_token_id
     return merge_pair(data, pair, token)
 
-def train(data, k=10):
+def train(text, k=10):
     tokens = {}
     seen_tokens = set()
     # Give the lowest token IDs to the chars in the corpus
-    for c in data:
+    for c in text:
         if c not in seen_tokens:
             tokens[len(tokens)] = c
             seen_tokens.add(c)
     token_ids = {v: k for k, v in tokens.items()}
     steps = []
     next_token_id = max(tokens.keys()) + 1
+    data = list(text)
     for i in range(k):
         data = train_one_round(tokens, token_ids, next_token_id, data, steps)
         next_token_id += 1
