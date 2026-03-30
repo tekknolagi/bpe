@@ -33,9 +33,11 @@ def train_one_round(tokens, token_ids, next_token_id, data, steps):
 
 def train(data, k=10):
     tokens = {}
+    seen_tokens = set()
     for c in data:
-        if c not in tokens:
+        if c not in seen_tokens:
             tokens[len(tokens)] = c
+            seen_tokens.add(c)
     token_ids = {v: k for k, v in tokens.items()}
     steps = []
     next_token_id = max(tokens.keys()) + 1
