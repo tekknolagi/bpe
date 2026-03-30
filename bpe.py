@@ -110,7 +110,7 @@ if __name__ == "__main__":
             token_ids = {v: int(k) for k, v in config["tokens"].items()}
             encoded = encode(token_ids, config["steps"], f.read())
         with open(args.output, "w+") as f:
-            json.dump(encoded, f)
+            json.dump(encoded, f, separators=(',', ':'))
     elif args.command == "decode":
         with open(args.config, "r") as f:
             config = json.load(f)
