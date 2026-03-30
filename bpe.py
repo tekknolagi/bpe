@@ -76,45 +76,46 @@ def encode(token_ids, steps, text):
         data = merge_pair(data, step, step[0]+step[1])
     return [token_ids[t] for t in data]
 
-import argparse
-parser = argparse.ArgumentParser(description="Train a BPE tokenizer.")
-subparsers = parser.add_subparsers(dest="command", required=True)
-train_parser = subparsers.add_parser("train", help="Train a BPE tokenizer.")
-train_parser.add_argument("--input", "-i", type=str, help="Input text file for training.")
-train_parser.add_argument("--rounds", "-r", type=int, default=10, help="Number of training rounds.")
-train_parser.add_argument("--output", "-o", type=str, help="Output config file.")
-encode_parser = subparsers.add_parser("encode", help="Encode text using a trained BPE tokenizer.")
-encode_parser.add_argument("--input", "-i", type=str, help="Input text file to encode.")
-encode_parser.add_argument("--config", "-c", type=str, help="Trained config file.")
-encode_parser.add_argument("--output", "-o", type=str, help="Output file to save the encoded data.")
-decode_parser = subparsers.add_parser("decode", help="Decode text using a trained BPE tokenizer.")
-decode_parser.add_argument("--input", "-i", type=str, help="Input text file to decode.")
-decode_parser.add_argument("--config", "-c", type=str, help="Trained config file.")
-decode_parser.add_argument("--output", "-o", type=str, help="Output file to save decoded data.")
-args = parser.parse_args()
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Train a BPE tokenizer.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    train_parser = subparsers.add_parser("train", help="Train a BPE tokenizer.")
+    train_parser.add_argument("--input", "-i", type=str, help="Input text file for training.")
+    train_parser.add_argument("--rounds", "-r", type=int, default=10, help="Number of training rounds.")
+    train_parser.add_argument("--output", "-o", type=str, help="Output config file.")
+    encode_parser = subparsers.add_parser("encode", help="Encode text using a trained BPE tokenizer.")
+    encode_parser.add_argument("--input", "-i", type=str, help="Input text file to encode.")
+    encode_parser.add_argument("--config", "-c", type=str, help="Trained config file.")
+    encode_parser.add_argument("--output", "-o", type=str, help="Output file to save the encoded data.")
+    decode_parser = subparsers.add_parser("decode", help="Decode text using a trained BPE tokenizer.")
+    decode_parser.add_argument("--input", "-i", type=str, help="Input text file to decode.")
+    decode_parser.add_argument("--config", "-c", type=str, help="Trained config file.")
+    decode_parser.add_argument("--output", "-o", type=str, help="Output file to save decoded data.")
+    args = parser.parse_args()
 
-import json
+    import json
 
-if args.command == "train":
-    k = args.rounds
-    encoded, tokens, token_ids, steps = train(TRAINING_DATA, k)
-    with open(args.output, "w+") as f:
-        json.dump({"tokens": tokens, "steps": steps}, f)
-elif args.command == "encode":
-    with open(args.config, "r") as f:
-        config = json.load(f)
-    with open(args.input, "r") as f:
-        token_ids = {v: int(k) for k, v in config["tokens"].items()}
-        encoded = encode(token_ids, config["steps"], f.read())
-    with open(args.output, "w+") as f:
-        json.dump(encoded, f)
-elif args.command == "decode":
-    with open(args.config, "r") as f:
-        config = json.load(f)
-    with open(args.input, "r") as f:
-        encoded = json.load(f)
-    decoded = decode({int(k): v for k, v in config["tokens"].items()}, encoded)
-    with open(args.output, "w+") as f:
-        f.write(decoded)
-else:
-    raise "wtf"
+    if args.command == "train":
+        k = args.rounds
+        encoded, tokens, token_ids, steps = train(TRAINING_DATA, k)
+        with open(args.output, "w+") as f:
+            json.dump({"tokens": tokens, "steps": steps}, f)
+    elif args.command == "encode":
+        with open(args.config, "r") as f:
+            config = json.load(f)
+        with open(args.input, "r") as f:
+            token_ids = {v: int(k) for k, v in config["tokens"].items()}
+            encoded = encode(token_ids, config["steps"], f.read())
+        with open(args.output, "w+") as f:
+            json.dump(encoded, f)
+    elif args.command == "decode":
+        with open(args.config, "r") as f:
+            config = json.load(f)
+        with open(args.input, "r") as f:
+            encoded = json.load(f)
+        decoded = decode({int(k): v for k, v in config["tokens"].items()}, encoded)
+        with open(args.output, "w+") as f:
+            f.write(decoded)
+    else:
+        raise "wtf"
