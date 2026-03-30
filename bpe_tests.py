@@ -44,5 +44,11 @@ class BPeTests(unittest.TestCase):
         self.assertEqual(steps, [('s', ' '), ('t', 'e'), ('r', 'e'), ('r', ' '), ('a', ' '), ('i', 'n'), ('e', ' '), ('t', ' '), ('q', 'u'), ('a', 'i'), ('c', 'o'), ('B', 'P'), ('BP', 'E'), ('i', 's '), ('a', 't'), ('c', 'h'), (' ', 'm'), ('qu', 'e'), ('que', 'n'), ('o', 'r ')])
         self.assertLess(len(encoded), len(text))
 
+    def test_encode(self):
+        text = "the fox jumped over the fence"
+        _, tokens, token_ids, steps = bpe.train(text, k=3)
+        encoded = bpe.encode(token_ids, steps, "the")
+        self.assertEqual([tokens[x] for x in encoded], ["the"])
+
 if __name__ == '__main__':
     unittest.main()
