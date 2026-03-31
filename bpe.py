@@ -30,29 +30,40 @@ def train_one_round(tokens, token_ids, next_token_id, data, steps):
     return merge_pair(data, pair, token)
 
 def train(text, k=10):
+    text = text.encode("utf-8")
     tokens = {}
     seen_tokens = set()
     # Give the lowest token IDs to the chars in the corpus
     for c in text:
+        c = bytes([c])
         if c not in seen_tokens:
             tokens[len(tokens)] = c
             seen_tokens.add(c)
     token_ids = {v: k for k, v in tokens.items()}
     steps = []
     next_token_id = max(tokens.keys()) + 1
-    data = list(text)
+    data = [bytes([c]) for c in text]
     for i in range(k):
         data = train_one_round(tokens, token_ids, next_token_id, data, steps)
         next_token_id += 1
-    # TODO(max): Add the rest of the printable characters after training so the
-    # more common tokens get lower IDs
+    for i in range(256):
+        c = bytes([i])
+        if c not in seen_tokens:
+            tokens[len(tokens)] = c
+            seen_tokens.add(c)
     return data, tokens, token_ids, steps
 
 def decode(tokens, data):
-    result = ""
+    result = b""
     for token_id in data:
         result += tokens[token_id]
     return result
+
+def encode(token_ids, steps, text):
+    data = [bytes([c]) for c in text]
+    for step in steps:
+        data = merge_pair(data, tuple(step), step[0]+step[1])
+    return [token_ids[t] for t in data]
 
 RESET_ALL = "\033[0m"
 RESET_FG = "\033[39m"
@@ -73,9 +84,3 @@ def colorize_tokens(tokens: list[str]) -> str:
         bg = BG_COLORS[i % len(BG_COLORS)]
         parts.append(f"{FG_BLACK}{bg}{token}{RESET_FG}{RESET_BG}")
     return "".join(parts) + RESET_ALL
-
-def encode(token_ids, steps, text):
-    data = list(text)
-    for step in steps:
-        data = merge_pair(data, tuple(step), step[0]+step[1])
-    return [token_ids[t] for t in data]

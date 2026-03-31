@@ -17,29 +17,30 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     import bpe
-    import json
+    import pickle
 
     if args.command == "train":
         k = args.rounds
         data = open(args.input).read()
         encoded, tokens, token_ids, steps = bpe.train(data, k)
-        with open(args.output, "w+") as f:
-            json.dump({"tokens": tokens, "steps": steps}, f)
+        with open(args.output, "wb+") as f:
+            print(tokens)
+            pickle.dump({"tokens": tokens, "steps": steps}, f)
     elif args.command == "encode":
-        with open(args.config, "r") as f:
-            config = json.load(f)
-        with open(args.input, "r") as f:
-            token_ids = {v: int(k) for k, v in config["tokens"].items()}
+        with open(args.config, "rb") as f:
+            config = pickle.load(f)
+        token_ids = {v: k for k, v in config["tokens"].items()}
+        with open(args.input, "rb") as f:
             encoded = bpe.encode(token_ids, config["steps"], f.read())
-        with open(args.output, "w+") as f:
-            json.dump(encoded, f)
+        with open(args.output, "wb+") as f:
+            pickle.dump(encoded, f)
     elif args.command == "decode":
-        with open(args.config, "r") as f:
-            config = json.load(f)
-        with open(args.input, "r") as f:
-            encoded = json.load(f)
-        decoded = bpe.decode({int(k): v for k, v in config["tokens"].items()}, encoded)
-        with open(args.output, "w+") as f:
+        with open(args.config, "rb") as f:
+            config = pickle.load(f)
+        with open(args.input, "rb") as f:
+            encoded = pickle.load(f)
+        decoded = bpe.decode(config["tokens"], encoded)
+        with open(args.output, "wb+") as f:
             f.write(decoded)
     else:
         raise "wtf"
